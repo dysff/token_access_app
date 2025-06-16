@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: white;
+  font-family: 'Roboto';
+}
+
+input {
+  font-family: 'Roboto';
+  font-weight: 300;
+  font-size: 15px;
+  height: 40px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
+button {
+  font-family: 'Roboto';
+  width: 300px; 
+  height: 40px;
+  border-radius: 5px;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-size: 20px;
+  background-color: rgb(38, 129, 255);
+}
+
+h1, p {
+  margin-left: 42px;
+}
+
+p {
+  width: 300px;
+}
+
+form {
+  width: 300px;
+  margin: 0 auto;
+}
+
+form > div {
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+}
+
+input[name='tokenInput'] {
+  padding-right: 40px;
+}
+
+.status-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}

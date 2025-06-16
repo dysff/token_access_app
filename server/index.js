@@ -20,8 +20,25 @@ app.post('/check-token', (req, res) => {
 });
 
 app.post('/make-calculations', (req, res) => {
-  const { a, b } = req.body;
-  res.json(a + b)
+  const rawA = req.body.a
+  const rawB = req.body.b
+  const numericRegex = /^-?\d+(\.\d+)?$/;
+
+  if (!numericRegex.test(rawA) || !numericRegex.test(rawB)) {
+    return res.status(400).json({ success: false, error: 'Only numbers allowed' });
+  }
+
+  const a = parseFloat(rawA);
+  const b = parseFloat(rawB);
+
+  if (isNaN(a) || isNaN(b)) {
+
+    return res.status(400).json({ success: false, error: 'Input is not a valid number'})
+  }
+  
+  const result = a + b;
+  res.json({ success: true, result: result});
+  console.log('Server calculation success result: ', result)
 });
 
 app.listen(PORT, () => {

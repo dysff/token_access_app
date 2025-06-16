@@ -13,12 +13,14 @@ let mainWindow;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: 'TokenAccessApp',
-    width: 900,
-    height: 600,
+    width: 400,
+    height: 450,
+    backgroundColor: '#1b1c1d',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true
-    }
+    },
+    autoHideMenuBar: true
   });
 
   if (isDev()) {
@@ -58,5 +60,28 @@ ipcMain.handle('check-token-and-get-response', async (event, token) => {
   } catch (error) {
     console.error('Error checking token with server:', error);
     return false;
+  }
+});
+
+ipcMain.handle('make-calculations-and-get-response', async (event, [valueA, valueB]) => {
+  console.log(`Received calculation request from React with values: ${valueA}, ${valueB}`)
+  try {
+    const response = await fetch('http://localhost:3001/make-calculations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ a: valueA, b: valueB})
+    });
+    const data = await response.json();
+    console.log('DATA: ', data)
+
+    if (data) {
+      
+      return data;
+    }
+    
+  } catch (error) {
+    console.log('Error making calculations with server: ', error);
+
+    return null;
   }
 });

@@ -1,34 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
+import './App.css';
 
 function App() {
   const initialToken = localStorage.getItem('app_token');
   const [token, setToken] = useState(initialToken);
-  const [showTokenInput, setShowTokenInput] = useState(!initialToken);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [tokenStatus, setTokenStatus] = useState('invalid');
+  const initialTokenCheckCompleted = useRef(false);
+
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [calculationError, setCalculationError] = useState(null);
 
   useEffect(() => {
     
-    if (token && showTokenInput && !loading) {
+    if (token && !initialTokenCheckCompleted.current && !loading) {
       setLoading(true);
 
       if (window.electron && window.electron.checkToken) {
         window.electron.checkToken(token)
           .then(isValid => {
             setLoading(false);
+
+            if (isValid) {
+              setTokenStatus('valid');
+            } else {
+              setToken(null);
+              localStorage.removeItem('app_token');
+              setTokenStatus('invalid')
+            }
           })
-
-          if (isValid) {
-            setShowTokenInput(false);
-          } else {
-            alert('Сохраненный токен недействителен. Введите новый.');
-            setToken(null);
-            localStorage.removeItem('app_token');
-          }
       }
+      initialTokenCheckCompleted.current = true;
     }
-  }, [token, showTokenInput, loading]);
+  }, [token, loading]);
 
-  const handleTokenSubmit = async (e) => { // ОБЯЗАТЕЛЬНО async, чтобы использовать await
+  const handleTokenSubmit = async (e) => {
     e.preventDefault();
     const inputToken = e.target.elements.tokenInput.value;
 
@@ -37,7 +43,7 @@ function App() {
       return;
     }
 
-    setLoading(true); // Начинаем загрузку
+    setLoading(true);
 
     if (window.electron && window.electron.checkToken) {
       try {
@@ -47,50 +53,118 @@ function App() {
         if (isValid) {
           setToken(inputToken);
           localStorage.setItem('app_token', inputToken);
-          setShowTokenInput(false);
+          setTokenStatus('valid');
         } else {
-          alert('Неверный токен! Пожалуйста, попробуйте снова.');
           setToken(null);
           localStorage.removeItem('app_token');
-          setShowTokenInput(true);
-        }
+          setTokenStatus('invalid');
+        };
       } catch (error) {
         console.error("Error during token submission:", error);
         setLoading(false);
-        alert('Произошла ошибка при проверке токена. Пожалуйста, попробуйте еще раз.');
         setToken(null);
         localStorage.removeItem('app_token');
-        setShowTokenInput(true);
-      }
-    }
+      };
+    };
   };
 
-  if (showTokenInput) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h1>Введите ваш токен</h1>
-        <form onSubmit={handleTokenSubmit}>
-          <input type="text" 
-          name="tokenInput" 
-          placeholder="Токен" 
-          required 
-          disabled={loading} 
-          />
-          <button 
-          type="submit" 
-          disabled={loading}
-          >{loading ? 'Проверка...' : 'Подтвердить'}</button>
-        </form>
-      </div>
-    );
-  }
+  const handleCalculation = async (e) => {
+    e.preventDefault(); // Why is it required here?
+    const valueA = e.target.elements.valueA.value;
+    const valueB = e.target.elements.valueB.value;
+
+    if (tokenStatus === 'valid') {
+      try {
+        const result = await window.electron.makeCalculation(valueA, valueB);
+
+        if (result.success === false) {
+          setCalculationError(result.error);
+          setCalculationResult(null);
+        } else {
+          setCalculationError(null);
+          setCalculationResult(result.result);
+        }
+      } catch (error) {
+        console.error('Error during calculations submission: ', error);
+        setCalculationResult(null);
+      };
+    };
+  };
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Добро пожаловать в основное приложение!</h1>
-      <p>Ваш токен: {token}</p>
+    <div>
+      <h1
+      style={{
+        fontSize: '28px'
+      }}>
+        Set up your calculations
+      </h1>
+
+      <p
+      style={{
+        marginTop: '-10px',
+        fontFamily: 'Roboto',
+      }}>
+        Enter your access token and values
+      </p>
+
+      <form onSubmit={handleTokenSubmit}>
+        <div>
+          <input 
+            type='text'
+            name='tokenInput'
+            placeholder={token ? localStorage.getItem('app_token') : 'Access token'}
+            disabled={loading}
+            >
+            </input>
+            {!loading && tokenStatus === 'valid' && <span className="status-icon valid">✅</span>}
+            {!loading && tokenStatus === 'invalid' && <span className="status-icon invalid">❌</span>}
+        </div>
+      </form>
+
+      <p>
+        Input numbers for calculation
+      </p>
+
+      <form onSubmit={handleCalculation}>
+        <input
+          type='text'
+          name='valueA'
+          placeholder='Value A'
+          >
+        </input>
+
+        <input
+          type='text'
+          name='valueB'
+          placeholder='Value B'
+          >
+        </input>
+
+        <button>
+          Calculate
+        </button>
+      </form>
+
+      {tokenStatus !== 'valid' && (
+        <p>
+          Please, enter your access token to get access to the functional
+        </p>
+      )}
+      
+      {calculationError !== null && (
+        <p>
+          Error occured during calculation: {calculationError}
+        </p>
+      )}
+
+      {calculationResult !== null && (
+        <p>
+          CALCULATION RESULT: <span style={{fontWeight: 'bold'}}>{calculationResult}</span>
+        </p>
+      )}
     </div>
-  );
+  )
 }
 
 export default App;
