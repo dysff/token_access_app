@@ -12,12 +12,53 @@ body {
   font-family: 'Roboto';
 }
 
-input {
+button {
+  cursor: pointer;
+}
+
+.login_register h1 {
+  text-align: center;
+}
+
+.login_register form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+}
+
+.login_register input, .login_register button {
+  width: 300px;
+  height: 35px;
+  border-radius: 5px;
+  border: none;
+}
+
+.login_register button {
+  background-color: rgb(38, 129, 255);
+}
+
+.login_register input {
+  margin-bottom: 20px; 
+}
+
+.auth-link {
+  color: rgb(38, 129, 255);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-link:hover {
+  color: rgb(58, 149, 255);
+}
+
+.app input {
   font-family: 'Roboto';
   font-weight: 300;
   font-size: 15px;
   height: 40px;
-  width: 100%;
+  width: 300px;
   border-radius: 5px;
   border: none;
   display: block;
@@ -25,7 +66,7 @@ input {
   margin-bottom: 10px;
 }
 
-button {
+.app button {
   font-family: 'Roboto';
   width: 300px; 
   height: 40px;
@@ -33,36 +74,31 @@ button {
   border: none;
   display: block;
   margin: 0 auto;
-  margin-bottom: 10px;
   font-weight: 500;
   font-size: 20px;
   background-color: rgb(38, 129, 255);
 }
 
-h1, p {
+.app h1, .app p {
   margin-left: 42px;
 }
 
-p {
+.app p {
   width: 300px;
 }
 
-form {
+.app form {
   width: 300px;
   margin: 0 auto;
 }
 
-form > div {
+.app form > div {
     position: relative; 
     display: flex; 
     align-items: center; 
 }
 
-input[name='tokenInput'] {
-  padding-right: 40px;
-}
-
-.status-icon {
+.app .status-icon {
   position: absolute;
   right: 10px;
   top: 10px;

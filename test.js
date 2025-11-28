@@ -1,0 +1,1 @@
+console.log(/[a-z0-9]/.test("sdD1"))

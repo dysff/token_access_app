@@ -1,0 +1,6 @@
+POST http://localhost:3001/check-database-match
+Content-Type: application/json
+
+{
+  "email": "somethi1ng@gmail.com"
+}
